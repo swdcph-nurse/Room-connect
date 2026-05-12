@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e3a46">
+  <title>ระบบจองห้องพิเศษออนไลน์</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body x-data="bookingApp()" x-init="init()">
+  <iframe name="gas-submit-target" title="GAS submit target" class="d-none"></iframe>
+
+  <form x-ref="transportForm" method="post" target="gas-submit-target" class="d-none">
+    <input type="hidden" name="action" value="submitBooking">
+    <input type="hidden" name="responseMode" value="iframe">
+    <input type="hidden" name="origin" x-ref="originInput">
+    <input type="hidden" name="payload" x-ref="payloadInput">
+  </form>
+
+  <div class="enterprise-shell">
+    <header class="topbar">
+      <div class="container">
+        <div class="topbar-inner">
+          <div class="brand-wrap">
+            <img src="hospital-logo.jpg" alt="ตราโรงพยาบาล" class="brand-logo">
+            <div>
+              <p class="eyebrow mb-1">ศูนย์บริการห้องพิเศษ</p>
+              <h1 class="brand-title mb-0">ระบบจองห้องพิเศษออนไลน์</h1>
+              <p class="brand-subtitle mb-0">โรงพยาบาลสมเด็จพระยุพราชสว่างแดนดิน</p>
+            </div>
+          </div>
+          <div class="contact-strip">
+            <a :href="lineContactUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success btn-contact">
+              <i class="fab fa-line me-2"></i>ติดต่อผ่าน LINE
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container pb-5">
+      <section class="hero-panel">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-7">
+            <p class="eyebrow mb-2">LINE Mini App</p>
+            <h2 class="hero-title mb-3">แบบฟอร์มกลางสำหรับผู้รับบริการและเจ้าหน้าที่</h2>
+            <p class="hero-copy mb-0">
+              ใช้สำหรับแจ้งความประสงค์จองห้องพิเศษ ตรวจสอบเงื่อนไขสิทธิ์ค่าห้อง และส่งข้อมูลเข้าระบบของโรงพยาบาลผ่าน LINE Official Account
+            </p>
+          </div>
+          <div class="col-lg-5">
+            <div class="hero-aside">
+              <div class="hero-aside-item hero-aside-item-line">
+                <span class="hero-aside-label">สถานะการเชื่อมต่อ LINE</span>
+                <strong x-text="lineState.statusMessage || 'กำลังตรวจสอบการเชื่อมต่อ'"></strong>
+                <div class="line-meta" x-show="lineState.environment" x-cloak>
+                  <span class="line-badge" x-text="'ENV: ' + lineState.environment.toUpperCase()"></span>
+                  <span class="line-badge line-badge-muted" x-text="'Channel ID: ' + (lineState.channelId || '-')"></span>
+                </div>
+                <div class="line-user" x-show="lineState.displayName" x-cloak>
+                  <img :src="lineState.pictureUrl || 'hospital-logo.jpg'" alt="LINE profile" class="line-avatar">
+                  <div>
+                    <div class="line-user-name" x-text="lineState.displayName"></div>
+                    <div class="line-user-subtext">ยืนยันตัวตนสำหรับการจองเรียบร้อยแล้ว</div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-open-line" x-show="!lineState.idToken && lineState.liffUrl" x-cloak @click="openInLine">
+                  เปิดผ่าน LINE Mini App
+                </button>
+              </div>
+              <div class="hero-aside-item">
+                <span class="hero-aside-label">เวลาติดต่อศูนย์รับจองห้องพิเศษ</span>
+                <strong>08.00-20.00 น.</strong>
+              </div>
+              <div class="hero-aside-item">
+                <span class="hero-aside-label">โทรศัพท์</span>
+                <strong>042-721111 ต่อ 4027, 4028</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="row g-4">
+        <div class="col-xl-7">
+          <div class="app-card form-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker mb-1">Booking Form</p>
+                <h3 class="section-title mb-0">กรอกข้อมูลการจองห้องพิเศษ</h3>
+              </div>
+              <button type="button" class="btn btn-light btn-reset" @click="resetForm">ล้างข้อมูล</button>
+            </div>
+
+            <div class="notice-banner mb-4">
+              การได้รับห้องพักขึ้นอยู่กับการพิจารณาของแพทย์เจ้าของไข้ ความพร้อมของผู้ป่วย และลำดับคิวของวันที่เข้ารับบริการ
+            </div>
+
+            <form novalidate @submit.prevent="submitBooking">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">ผู้ป่วยประเภท <span class="text-danger">*</span></label>
+                  <select class="form-select" x-model="form.patientType" @change="handlePatientTypeChange" required>
+                    <option value="">กรุณาเลือก</option>
+                    <template x-for="patientType in bootstrap.options.patientTypes" :key="patientType">
+                      <option :value="patientType" x-text="patientType"></option>
+                    </template>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">ชื่อ-สกุลผู้เข้าพัก <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" x-model.trim="form.patientName" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">โทรศัพท์ <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control" x-model.trim="form.phone" placeholder="ตัวอย่าง 0812345678" inputmode="numeric" required>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">วันที่จองห้อง <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" x-model="form.bookingDate" required>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">วันที่ต้องการเข้าพัก <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" x-model="form.checkinDate" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">สิทธิ์การรักษา <span class="text-danger">*</span></label>
+                  <select class="form-select" x-model="form.rights" required>
+                    <option value="">กรุณาเลือก</option>
+                    <template x-for="rights in bootstrap.options.rights" :key="rights">
+                      <option :value="rights" x-text="rights"></option>
+                    </template>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">หอผู้ป่วย/แผนกที่เข้าพักรักษา <span class="text-danger">*</span></label>
+                  <select class="form-select" x-model="form.department" @change="handleDepartmentChange" required>
+                    <option value="">กรุณาเลือก</option>
+                    <template x-for="department in bootstrap.options.departments" :key="department">
+                      <option :value="department" x-text="department"></option>
+                    </template>
+                  </select>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">นัดนอนโรงพยาบาล เพื่อ (กรณีผู้ป่วยจองล่วงหน้า)</label>
+                  <textarea class="form-control" rows="3" x-model.trim="form.appointmentDetails" placeholder="ระบุวันนัด เหตุผลในการนอนโรงพยาบาล หรือรายละเอียดการเตรียมตัวก่อนทำหัตถการ"></textarea>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">แพทย์เจ้าของไข้</label>
+                  <input type="text" class="form-control" x-model.trim="form.doctorName">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">เจ้าหน้าที่ผู้ออกใบจอง</label>
+                  <input type="text" class="form-control" x-model.trim="form.staffName" placeholder="ชื่อเจ้าหน้าที่">
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <section class="field-group">
+                <div class="field-heading">
+                  <div>
+                    <label class="form-label mb-1">ราคาห้องพิเศษที่จอง <span class="text-danger">*</span></label>
+                    <p class="field-helper mb-0">ราคาที่แสดงเป็นราคาเต็มก่อนหักส่วนลดตามสิทธิ์การรักษา</p>
+                  </div>
+                  <span class="validation-inline" x-show="vipPriceWarning" x-cloak>ราคา 1500 บาท ใช้ได้เฉพาะสูติ-นรีเวชกรรม</span>
+                </div>
+
+                <div class="selection-grid selection-grid-price">
+                  <template x-for="price in bootstrap.options.roomPrices" :key="price">
+                    <label class="choice-card">
+                      <input type="checkbox" :value="price" x-model="form.roomPrices" @change="handleRoomFiltersChanged">
+                      <span class="choice-card-body">
+                        <span class="choice-main" x-text="price"></span>
+                        <span class="choice-sub">บาท / คืน</span>
+                      </span>
+                    </label>
+                  </template>
+                </div>
+              </section>
+
+              <section class="field-group">
+                <div class="field-heading">
+                  <div>
+                    <label class="form-label mb-1">ห้องพิเศษที่จอง <span class="text-danger">*</span></label>
+                    <p class="field-helper mb-0">ระบบจะแสดงเฉพาะห้องที่สอดคล้องกับแผนกและราคาห้องที่เลือก</p>
+                  </div>
+                  <span class="room-count" x-text="availableRooms.length ? 'พบ ' + availableRooms.length + ' ห้อง' : 'ยังไม่พบรายการห้อง'"></span>
+                </div>
+
+                <div class="empty-state" x-show="!form.department || !form.roomPrices.length" x-cloak>
+                  กรุณาเลือกแผนกและราคาห้องก่อน เพื่อให้ระบบกรองรายการห้องที่สามารถจองได้
+                </div>
+
+                <div class="empty-state" x-show="form.department && form.roomPrices.length && !availableRooms.length" x-cloak>
+                  ยังไม่พบห้องที่ตรงกับเงื่อนไขที่เลือก กรุณาตรวจสอบข้อมูลห้องหรือสอบถามเจ้าหน้าที่
+                </div>
+
+                <div class="selection-grid selection-grid-room" x-show="form.department && form.roomPrices.length && availableRooms.length" x-cloak>
+                  <template x-for="room in availableRooms" :key="room.id">
+                    <label class="choice-card room-choice">
+                      <input type="checkbox" :value="room.roomName" x-model="form.roomBooked">
+                      <span class="choice-card-body">
+                        <span class="choice-main" x-text="room.roomName"></span>
+                        <span class="choice-meta" x-text="room.department"></span>
+                        <span class="choice-sub">ราคา <span x-text="room.price"></span> บาท / คืน</span>
+                        <span class="choice-note" x-show="room.capacity || room.note" x-text="[room.capacity, room.note].filter(Boolean).join(' | ')"></span>
+                      </span>
+                    </label>
+                  </template>
+                </div>
+              </section>
+
+              <section class="field-group">
+                <div class="service-card">
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="staffOrRelative" x-model="form.isStaffOrRelative">
+                    <label class="form-check-label" for="staffOrRelative">
+                      เจ้าหน้าที่โรงพยาบาล หรือญาติสายตรง
+                    </label>
+                  </div>
+
+                  <div x-show="form.isStaffOrRelative" x-cloak>
+                    <label class="form-label">ระบุรายละเอียด <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" x-model.trim="form.notes" placeholder="เช่น เจ้าหน้าที่หอผู้ป่วย / บิดา มารดา คู่สมรส หรือบุตรของเจ้าหน้าที่">
+                  </div>
+                </div>
+              </section>
+
+              <div class="action-bar">
+                <button type="submit" class="btn btn-primary btn-submit" :disabled="submitting">
+                  <span class="spinner-border spinner-border-sm me-2" x-show="submitting" x-cloak></span>
+                  <span x-text="submitting ? 'กำลังบันทึกข้อมูล...' : 'ยืนยันการจองห้องพิเศษ'"></span>
+                </button>
+                <a :href="lineContactUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success btn-submit-secondary">
+                  <i class="fab fa-line me-2"></i>ติดต่อเจ้าหน้าที่
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-xl-5">
+          <div class="app-card mb-4">
+            <div class="section-head section-head-tight">
+              <div>
+                <p class="section-kicker mb-1">Benefit & Pricing</p>
+                <h3 class="section-title mb-0">สิทธิ์ค่าห้องพิเศษ</h3>
+              </div>
+            </div>
+
+            <div class="pricing-alert">
+              ค่าห้องพิเศษทุกระดับเป็นราคาเต็มก่อนหักส่วนลดตามสิทธิ์การรักษา
+            </div>
+
+            <div class="policy-list">
+              <template x-for="policy in benefitPolicies" :key="policy.rights">
+                <div class="policy-item" :class="{'policy-item-active': form.rights === policy.rights}">
+                  <div class="policy-header">
+                    <strong x-text="policy.shortLabel"></strong>
+                    <span x-show="form.rights === policy.rights" x-cloak>สิทธิ์ที่เลือก</span>
+                  </div>
+                  <p class="mb-0" x-text="policy.detail"></p>
+                </div>
+              </template>
+            </div>
+
+            <div class="estimate-panel" x-show="form.rights && pricingPreview.length" x-cloak>
+              <div class="estimate-head">
+                <h4 class="estimate-title mb-0">ประมาณการชำระต่อคืน</h4>
+                <span class="estimate-caption" x-text="form.rights"></span>
+              </div>
+              <div class="estimate-table">
+                <template x-for="item in pricingPreview" :key="item.fullPrice">
+                  <div class="estimate-row">
+                    <div>
+                      <div class="estimate-label">ราคาห้อง <span x-text="formatBaht(item.fullPrice)"></span> บาท</div>
+                      <div class="estimate-sub">ส่วนลด <span x-text="formatBaht(item.discount)"></span> บาท</div>
+                    </div>
+                    <div class="estimate-payable">
+                      ชำระประมาณ <strong x-text="formatBaht(item.payable)"></strong> บาท
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-card mb-4">
+            <div class="section-head section-head-tight">
+              <div>
+                <p class="section-kicker mb-1">Booking Guidance</p>
+                <h3 class="section-title mb-0">รายละเอียดการจองห้องพิเศษ</h3>
+              </div>
+            </div>
+
+            <div class="tab-switcher">
+              <button type="button" class="tab-btn" :class="{'tab-btn-active': bookingGuideTab === 'inpatient'}" @click="bookingGuideTab = 'inpatient'">
+                ผู้ป่วยรายใหม่หรือกำลังรักษาอยู่
+              </button>
+              <button type="button" class="tab-btn" :class="{'tab-btn-active': bookingGuideTab === 'advance'}" @click="bookingGuideTab = 'advance'">
+                ผู้ป่วยจองล่วงหน้า
+              </button>
+            </div>
+
+            <ol class="guide-list">
+              <template x-for="(item, index) in currentGuideItems" :key="bookingGuideTab + '-' + index">
+                <li x-text="item"></li>
+              </template>
+            </ol>
+          </div>
+
+          <div class="app-card contact-card">
+            <div class="section-head section-head-tight">
+              <div>
+                <p class="section-kicker mb-1">Contact Center</p>
+                <h3 class="section-title mb-0">ช่องทางติดต่อศูนย์รับจองห้องพิเศษ</h3>
+              </div>
+            </div>
+
+            <div class="contact-grid">
+              <div class="contact-item">
+                <span class="contact-label">สถานที่ติดต่อ</span>
+                <strong>ตึกพิเศษปาริฉัตร ชั้น 4</strong>
+              </div>
+              <div class="contact-item">
+                <span class="contact-label">เวลาให้บริการ</span>
+                <strong>08.00-20.00 น.</strong>
+              </div>
+              <div class="contact-item">
+                <span class="contact-label">โทรศัพท์</span>
+                <strong>042-721111 ต่อ 4027, 4028</strong>
+              </div>
+              <div class="contact-item">
+                <span class="contact-label">LINE ID</span>
+                <strong x-text="bootstrap.lineId || 'parichat4.vip'"></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
