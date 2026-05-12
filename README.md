@@ -41,7 +41,7 @@
 
 ## LINE Mini App ที่ใช้
 
-ข้อมูลที่ตั้งไว้ใน [assets/config.js](/D:/NUT/จองห้องพิเศษสำหรับทั่วไป/assets/config.js)
+ข้อมูลที่ตั้งไว้ใน [config.js](/D:/NUT/จองห้องพิเศษสำหรับทั่วไป/config.js)
 
 ```text
 Developing
@@ -109,7 +109,7 @@ BOOKING_START_ROW=2
 
 ## การตั้งค่า Frontend
 
-1. แก้ค่าใน [assets/config.js](/D:/NUT/จองห้องพิเศษสำหรับทั่วไป/assets/config.js) ตาม environment จริง
+1. แก้ค่าใน [config.js](/D:/NUT/จองห้องพิเศษสำหรับทั่วไป/config.js) ตาม environment จริง
 2. นำไฟล์ขึ้น GitHub repository
 3. เปิด GitHub Pages
 4. ตั้ง Endpoint URL ของ LINE Mini App ให้ชี้มายัง URL ของ GitHub Pages ตาม environment
