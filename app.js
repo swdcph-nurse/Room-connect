@@ -277,12 +277,7 @@
 
           // Auto-login if inside LINE environment and not logged in
           if (!this.lineState.loggedIn && (this.lineState.inClient || isLineBrowser)) {
-            const redirectUrl = new URL(window.location.href);
-            redirectUrl.searchParams.delete('code');
-            redirectUrl.searchParams.delete('state');
-            redirectUrl.searchParams.delete('liffClientId');
-            redirectUrl.searchParams.delete('liffRedirectUri');
-            window.liff.login({ redirectUri: redirectUrl.toString() });
+            window.liff.login();
             return;
           }
 
@@ -397,12 +392,7 @@
       loginLine() {
         if (window.liff) {
           if (!window.liff.isLoggedIn()) {
-            const redirectUrl = new URL(window.location.href);
-            redirectUrl.searchParams.delete('code');
-            redirectUrl.searchParams.delete('state');
-            redirectUrl.searchParams.delete('liffClientId');
-            redirectUrl.searchParams.delete('liffRedirectUri');
-            window.liff.login({ redirectUri: redirectUrl.toString() });
+            window.liff.login();
           }
         } else {
           Swal.fire({
