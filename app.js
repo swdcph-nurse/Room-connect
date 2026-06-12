@@ -572,7 +572,6 @@
         this.pendingRequestId = '';
 
         if (payload.ok) {
-          this.sendLineFlexMessage(payload.data || {});
           this.showSuccess(payload.data || {});
           this.resetForm();
           return;
