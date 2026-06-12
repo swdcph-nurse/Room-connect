@@ -277,7 +277,12 @@
 
           // Auto-login if inside LINE environment and not logged in
           if (!this.lineState.loggedIn && (this.lineState.inClient || isLineBrowser)) {
-            window.liff.login();
+            const redirectUrl = new URL(window.location.href);
+            redirectUrl.searchParams.delete('code');
+            redirectUrl.searchParams.delete('state');
+            redirectUrl.searchParams.delete('liffClientId');
+            redirectUrl.searchParams.delete('liffRedirectUri');
+            window.liff.login({ redirectUri: redirectUrl.toString() });
             return;
           }
 
@@ -293,6 +298,17 @@
             ? 'เชื่อมต่อบัญชี LINE เรียบร้อยแล้ว'
             : 'กรุณาเปิดใช้งานผ่าน LINE เพื่อยืนยันตัวตน';
         } catch (error) {
+          // If oauth parameters are in the URL but init failed, clean them up and reload
+          const url = new URL(window.location.href);
+          if (url.searchParams.has('code') || url.searchParams.has('state')) {
+            url.searchParams.delete('code');
+            url.searchParams.delete('state');
+            url.searchParams.delete('liffClientId');
+            url.searchParams.delete('liffRedirectUri');
+            window.location.replace(url.toString());
+            return;
+          }
+
           this.lineState.error = getErrorMessage(error);
           this.lineState.statusMessage = 'เชื่อมต่อ LINE Mini App ไม่สำเร็จ';
           if (isLineBrowser) {
@@ -381,7 +397,12 @@
       loginLine() {
         if (window.liff) {
           if (!window.liff.isLoggedIn()) {
-            window.liff.login();
+            const redirectUrl = new URL(window.location.href);
+            redirectUrl.searchParams.delete('code');
+            redirectUrl.searchParams.delete('state');
+            redirectUrl.searchParams.delete('liffClientId');
+            redirectUrl.searchParams.delete('liffRedirectUri');
+            window.liff.login({ redirectUri: redirectUrl.toString() });
           }
         } else {
           Swal.fire({
@@ -392,11 +413,21 @@
         }
       },
 
+      logoutLine() {
+        if (window.liff) {
+          if (window.liff.isLoggedIn()) {
+            window.liff.logout();
+            this.lineState = createEmptyLineState();
+            window.location.replace(window.location.pathname);
+          }
+        }
+      },
+
       validateForm() {
         if (!this.config.apiUrl) {
           return 'ยังไม่ได้ตั้งค่า GAS Web App URL';
         }
-        if (this.requiresLineLogin && !this.lineState.idToken) {
+        if (this.requiresLineLogin && !this.lineState.loggedIn) {
           return 'กรุณายืนยันตัวตนผ่าน LINE (เข้าสู่ระบบหรือสแกน QR Code) ก่อนทำรายการ';
         }
         if (!this.form.patientType) {
