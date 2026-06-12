@@ -319,12 +319,22 @@
         this.bootstrapError = '';
 
         try {
-          const payload = await loadJsonp(
-            buildUrl(this.config.apiUrl, {
-              action: 'bootstrap',
-              prefix: '__bookingBootstrapCallback__' + Date.now()
-            })
-          );
+          let payload;
+          if (typeof google !== 'undefined' && google.script && google.script.run) {
+            payload = await new Promise((resolve, reject) => {
+              google.script.run
+                .withSuccessHandler(resolve)
+                .withFailureHandler(reject)
+                .getBootstrapData();
+            });
+          } else {
+            payload = await loadJsonp(
+              buildUrl(this.config.apiUrl, {
+                action: 'bootstrap',
+                prefix: '__bookingBootstrapCallback__' + Date.now()
+              })
+            );
+          }
 
           if (!payload || payload.ok === false) {
             throw new Error('ไม่สามารถโหลดข้อมูลตั้งต้นจากระบบหลังบ้านได้');
@@ -414,7 +424,7 @@
       },
 
       validateForm() {
-        if (!this.config.apiUrl) {
+        if (!this.config.apiUrl && !(typeof google !== 'undefined' && google.script && google.script.run)) {
           return 'ยังไม่ได้ตั้งค่า GAS Web App URL';
         }
         if (this.requiresLineLogin && !this.lineState.loggedIn) {
@@ -525,7 +535,32 @@
           }
         });
 
-        if (this.bootstrap.submitMode === 'jsonp') {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run
+            .withSuccessHandler((response) => {
+              window.clearTimeout(this.submitTimeoutId);
+              this.handlePostMessage({
+                data: {
+                  type: 'booking-submit-result',
+                  ok: true,
+                  requestId: this.pendingRequestId,
+                  data: response
+                }
+              });
+            })
+            .withFailureHandler((error) => {
+              window.clearTimeout(this.submitTimeoutId);
+              this.submitting = false;
+              this.pendingRequestId = '';
+              Swal.fire({
+                icon: 'error',
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                text: error.message || 'การเชื่อมต่อระบบหลังบ้านล้มเหลว',
+                confirmButtonText: 'ตกลง'
+              });
+            })
+            .submitBooking(payload);
+        } else if (this.bootstrap.submitMode === 'jsonp') {
           const jsonpUrl = buildUrl(this.config.apiUrl, {
             action: 'submitBooking',
             payload: JSON.stringify(payload),
