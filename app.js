@@ -462,7 +462,20 @@
         return '';
       },
 
-      submitBooking() {
+      async submitBooking() {
+        if (window.liff && window.liff.isLoggedIn()) {
+          try {
+            const profile = await window.liff.getProfile();
+            if (profile) {
+              this.lineState.displayName = profile.displayName || this.lineState.displayName || '';
+              this.lineState.userId = profile.userId || this.lineState.userId || '';
+              this.lineState.pictureUrl = profile.pictureUrl || this.lineState.pictureUrl || '';
+            }
+          } catch (e) {
+            console.error('Failed to dynamically fetch LINE profile on submission:', e);
+          }
+        }
+
         const validationError = this.validateForm();
         if (validationError) {
           Swal.fire({
