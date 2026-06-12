@@ -522,10 +522,34 @@
           }
         });
 
-        this.$refs.transportForm.action = this.config.apiUrl;
-        this.$refs.originInput.value = window.location.origin || '';
-        this.$refs.payloadInput.value = JSON.stringify(payload);
-        this.$refs.transportForm.submit();
+        if (this.bootstrap.submitMode === 'jsonp') {
+          const jsonpUrl = buildUrl(this.config.apiUrl, {
+            action: 'submitBooking',
+            payload: JSON.stringify(payload),
+            requestId: this.pendingRequestId,
+            prefix: '__bookingSubmitCallback__' + Date.now()
+          });
+
+          loadJsonp(jsonpUrl).then(response => {
+            window.clearTimeout(this.submitTimeoutId);
+            this.handlePostMessage({ data: response });
+          }).catch(error => {
+            window.clearTimeout(this.submitTimeoutId);
+            this.submitting = false;
+            this.pendingRequestId = '';
+            Swal.fire({
+              icon: 'error',
+              title: 'บันทึกข้อมูลไม่สำเร็จ',
+              text: error.message || 'การเชื่อมต่อระบบหลังบ้านล้มเหลว',
+              confirmButtonText: 'ตกลง'
+            });
+          });
+        } else {
+          this.$refs.transportForm.action = this.config.apiUrl;
+          this.$refs.originInput.value = window.location.origin || '';
+          this.$refs.payloadInput.value = JSON.stringify(payload);
+          this.$refs.transportForm.submit();
+        }
 
         window.clearTimeout(this.submitTimeoutId);
         this.submitTimeoutId = window.setTimeout(() => {
