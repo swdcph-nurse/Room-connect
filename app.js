@@ -378,15 +378,26 @@
         }
       },
 
+      loginLine() {
+        if (window.liff) {
+          if (!window.liff.isLoggedIn()) {
+            window.liff.login();
+          }
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'ไม่สามารถดำเนินการได้',
+            text: 'ไม่พบ LINE LIFF SDK'
+          });
+        }
+      },
+
       validateForm() {
         if (!this.config.apiUrl) {
           return 'ยังไม่ได้ตั้งค่า GAS Web App URL';
         }
-        const isLineEnv = this.lineState.inClient || /Line/i.test(navigator.userAgent);
         if (this.requiresLineLogin && !this.lineState.idToken) {
-          if (!isLineEnv) {
-            return 'กรุณาเปิดแบบฟอร์มผ่าน LINE Mini App เพื่อยืนยันตัวตนก่อนทำรายการ';
-          }
+          return 'กรุณายืนยันตัวตนผ่าน LINE (เข้าสู่ระบบหรือสแกน QR Code) ก่อนทำรายการ';
         }
         if (!this.form.patientType) {
           return 'กรุณาเลือกประเภทผู้ป่วย';
