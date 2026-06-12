@@ -7,12 +7,12 @@
     lineContactUrl: 'https://line.me/ti/p/~parichat4.vip',
     submitMode: 'iframe-postmessage',
     options: {
-      patientTypes: ['ผู้ป่วยที่กำลังนอนรักษาอยู่', 'ผู้ป่วยจองล่วงหน้า'],
+      patientTypes: ['ผู้ป่วยที่กำลังรักษาอยู่', 'ผู้ป่วยจองล่วงหน้า'],
       rights: [
         'บัตรทอง',
         'ประกันสังคม',
-        'ประกันสังคม (คลอดบุตร)',
-        'เบิกได้',
+        'ประกันสังคมคลอดบุตร',
+        'สิทธิ์สวัสดิการข้าราชการ (เบิกได้-จ่ายตรง)',
         'อสม.',
         'บุคคลในครอบครัวอสม.'
       ],
@@ -20,11 +20,10 @@
         'กุมารเวชกรรม',
         'อายุรกรรมหญิง',
         'อายุรกรรมชาย',
-        'ศัลยกรรมทั่วไป',
         'ศัลยกรรมกระดูก',
-        'สูติ-นรีเวชกรรม',
-        'จักษุ',
-        'โสต ศอ นาสิก',
+        'ศัลยกรรมทั่วไป',
+        'จักษุ (ตา)',
+        'โสต ศอ นาสิก (หูคอจมูก)',
         'อื่นๆ'
       ],
       roomPrices: ['1200', '1400', '1500']
@@ -52,16 +51,16 @@
       }
     },
     {
-      rights: 'ประกันสังคม (คลอดบุตร)',
-      shortLabel: 'ประกันสังคม (คลอดบุตร)',
+      rights: 'ประกันสังคมคลอดบุตร',
+      shortLabel: 'ประกันสังคมคลอดบุตร',
       detail: 'ชำระค่าห้องพิเศษเต็มจำนวน',
       calculate(price) {
         return { discount: 0, payable: price };
       }
     },
     {
-      rights: 'เบิกได้',
-      shortLabel: 'เบิกได้',
+      rights: 'สิทธิ์สวัสดิการข้าราชการ (เบิกได้-จ่ายตรง)',
+      shortLabel: 'สิทธิ์สวัสดิการข้าราชการ (เบิกได้-จ่ายตรง)',
       detail: 'ส่วนลดค่าห้องพิเศษจากราคาเต็ม 1,000 บาท / คืน',
       calculate(price) {
         const discount = Math.min(1000, price);
@@ -99,14 +98,24 @@
     advance: [
       'ผู้ป่วยต้องมีวันนัดนอนโรงพยาบาลและใบนัดแพทย์ที่ชัดเจน',
       'รองรับกรณีนัดผ่าตัดคลอด นัดผ่าตัดทั่วไป นัดส่องกล้องทางเดินอาหาร หรือการนอนเพื่อเตรียมทำหัตถการ',
-      'ติดต่อจองที่ตึกพิเศษปาริฉัตร ชั้น 4 (ศูนย์รับจองห้องพิเศษ) เวลา 08.00-20.00 น.',
-      'กรณีชำระค่าห้อง 1,000 บาท หรืออุปถัมภ์ห้องพัก สามารถเข้าพักล่วงหน้าก่อนวันนัดได้ ยกเว้นตึกพิเศษสูติกรรมและพิเศษพวงชมพู',
-      'กรณีจองล่วงหน้าโดยยังไม่ได้ชำระเงิน การเข้าพักขึ้นอยู่กับห้องว่างในวันที่มาถึงและลำดับคิวของวันนั้น',
-      'หากชำระเงินไว้แล้วแต่โรงพยาบาลไม่สามารถจัดห้องให้ได้ จะมีการแจ้งล่วงหน้า 1 วัน และสามารถติดต่อรับเงินคืนได้',
+      'การเข้าพักขึ้นอยู่กับห้องว่างในวันที่มาถึงและลำดับคิวของวันนั้น',
       'หากมีการเลื่อนนัดหรือไม่ได้มานอนตามนัด กรุณาแจ้งศูนย์รับจองห้องพิเศษ โทร 042-721111 ต่อ 4027, 4028',
       'การตรวจสอบราคาห้องตามสิทธิ์ สามารถสอบถามงานประกันสุขภาพ แผนกรักษา หรือศูนย์รับจองห้องพิเศษ'
     ]
   };
+
+  const STATIC_ROOMS = [
+    { roomName: 'ศัลยกรรมทั่วไป - ห้องพิเศษสามัญ (ราคา 1,200)', price: 1200, dept: 'ศัลยกรรมทั่วไป' },
+    { roomName: 'ศัลยกรรมกระดูก - ห้องพิเศษสามัญ (ราคา 1,200)', price: 1200, dept: 'ศัลยกรรมกระดูก' },
+    { roomName: 'สูติ-นรีเวช - ห้องพิเศษสามัญ (ราคา 1,200)', price: 1200, dept: 'สูติ-นรีเวช' },
+    { roomName: 'สูติ-นรีเวช - ห้องพิเศษ VVIP (ราคา 1,500)', price: 1500, dept: 'สูติ-นรีเวช' },
+    { roomName: 'พวงชมพู - หอผู้ป่วยพิเศษ (ราคา 1,400)', price: 1400, dept: 'อื่นๆ' },
+    { roomName: 'กุมารเวชกรรม - ห้องพิเศษสามัญ (ราคา 1,200)', price: 1200, dept: 'กุมารเวชกรรม' },
+    { roomName: 'อายุรกรรมชาย - ห้องพิเศษสามัญ (ราคา 1,200)', price: 1200, dept: 'อายุรกรรมชาย' },
+    { roomName: 'อายุรกรรมหญิง - ห้องพิเศษสามัญ (ราคา 1,200)', price: 1200, dept: 'อายุรกรรมหญิง' },
+    { roomName: 'ปาริฉัตร - หอผู้ป่วยพิเศษ (ราคา 1,400)', price: 1400, dept: 'อื่นๆ' },
+    { roomName: 'เคมีบำบัด - ห้องพิเศษสามัญ (ราคา 1,000)', price: 1000, dept: 'อื่นๆ' }
+  ];
 
   function createEmptyForm() {
     return {
@@ -117,10 +126,11 @@
       checkinDate: '',
       rights: '',
       department: '',
+      departmentOther: '',
       appointmentDetails: '',
       doctorName: '',
-      roomPrices: [],
-      roomBooked: [],
+      roomPrices: [], // Array of checked prices (1200, 1400, 1500)
+      roomBooked: [], // Array containing selected room name
       isStaffOrRelative: false,
       notes: '',
       staffName: ''
@@ -155,12 +165,16 @@
       loadingBootstrap: false,
       submitting: false,
       pendingRequestId: '',
-      vipPriceWarning: false,
       bookingGuideTab: 'inpatient',
       lineState: createEmptyLineState(),
       form: createEmptyForm(),
       messageHandler: null,
       submitTimeoutId: null,
+
+      // UI popups control
+      showGuidanceModal: false,
+      guidanceAccepted: false,
+      selectedRightBenefit: null,
 
       async init() {
         this.messageHandler = this.handlePostMessage.bind(this);
@@ -188,33 +202,31 @@
         return BENEFIT_POLICIES.find((policy) => policy.rights === this.form.rights) || null;
       },
 
-      get availableRooms() {
-        const selectedDepartment = this.form.department;
-        const selectedPrices = this.form.roomPrices;
-
-        return this.bootstrap.roomConfigurations.filter(function(room) {
-          return room.department === selectedDepartment && selectedPrices.includes(String(room.price));
+      // Filtered rooms based on chosen price filters
+      get filteredRooms() {
+        return STATIC_ROOMS.filter(room => {
+          if (this.form.roomPrices.length === 0) return true;
+          return this.form.roomPrices.includes(String(room.price));
         });
       },
 
+      // Calculate benefit breakdown card data
       get pricingPreview() {
         const selectedPolicy = this.selectedBenefitPolicy;
-        const selectedPrices = Array.from(new Set(this.form.roomPrices.map(function(price) {
-          return Number(price);
-        }).filter(function(price) {
-          return Number.isFinite(price);
-        }))).sort(function(left, right) {
-          return left - right;
-        });
+        if (!selectedPolicy || this.form.roomBooked.length === 0) {
+          return null;
+        }
 
-        return selectedPrices.map(function(price) {
-          const computed = selectedPolicy ? selectedPolicy.calculate(price) : { discount: 0, payable: price };
-          return {
-            fullPrice: price,
-            discount: computed.discount,
-            payable: computed.payable
-          };
-        });
+        const roomObj = STATIC_ROOMS.find(r => r.roomName === this.form.roomBooked[0]);
+        if (!roomObj) return null;
+
+        const price = roomObj.price;
+        const computed = selectedPolicy.calculate(price);
+        return {
+          fullPrice: price,
+          discount: computed.discount,
+          payable: computed.payable
+        };
       },
 
       get currentGuideItems() {
@@ -288,7 +300,6 @@
           }
 
           this.bootstrap = normalizeBootstrap(payload);
-          this.handleRoomFiltersChanged();
         } catch (error) {
           this.bootstrapError = getErrorMessage(error) || 'เชื่อมต่อระบบหลังบ้านไม่สำเร็จ';
           Swal.fire({
@@ -302,47 +313,43 @@
       },
 
       handlePatientTypeChange() {
+        if (!this.form.patientType) {
+          this.guidanceAccepted = false;
+          return;
+        }
         this.bookingGuideTab = this.form.patientType === 'ผู้ป่วยจองล่วงหน้า' ? 'advance' : 'inpatient';
+        // Reset acceptance
+        this.guidanceAccepted = false;
+        // Open the Guidance Modal immediately
+        this.showGuidanceModal = true;
       },
 
-      handleDepartmentChange() {
-        if (this.form.department !== 'สูติ-นรีเวชกรรม' && this.form.roomPrices.includes('1500')) {
-          this.form.roomPrices = this.form.roomPrices.filter(function(price) {
-            return price !== '1500';
-          });
-          this.vipPriceWarning = true;
-          Swal.fire({
-            icon: 'warning',
-            title: 'เงื่อนไขราคาห้อง',
-            text: 'ราคาห้อง 1500 บาท ใช้ได้เฉพาะแผนกสูติ-นรีเวชกรรม'
-          });
-        } else {
-          this.vipPriceWarning = false;
+      acceptGuidance() {
+        this.guidanceAccepted = true;
+        this.showGuidanceModal = false;
+      },
+
+      handleRightsChange() {
+        this.selectedRightBenefit = this.selectedBenefitPolicy;
+      },
+
+      handleRoomChange(e) {
+        const roomName = e.target.value;
+        if (!roomName) {
+          this.form.roomBooked = [];
+          return;
         }
+        this.form.roomBooked = [roomName];
 
-        this.syncSelectedRooms();
-      },
-
-      handleRoomFiltersChanged() {
-        this.vipPriceWarning = this.form.roomPrices.includes('1500') && this.form.department !== 'สูติ-นรีเวชกรรม';
-
-        if (this.vipPriceWarning) {
-          this.form.roomPrices = this.form.roomPrices.filter(function(price) {
-            return price !== '1500';
-          });
+        // Sync price checkbox
+        const roomObj = STATIC_ROOMS.find(r => r.roomName === roomName);
+        if (roomObj) {
+          const priceStr = String(roomObj.price);
+          // Auto check price checkbox if not already checked (if it's 1200, 1400, 1500)
+          if (['1200', '1400', '1500'].includes(priceStr) && !this.form.roomPrices.includes(priceStr)) {
+            this.form.roomPrices.push(priceStr);
+          }
         }
-
-        this.syncSelectedRooms();
-      },
-
-      syncSelectedRooms() {
-        const allowedRoomNames = this.availableRooms.map(function(room) {
-          return room.roomName;
-        });
-
-        this.form.roomBooked = this.form.roomBooked.filter(function(roomName) {
-          return allowedRoomNames.includes(roomName);
-        });
       },
 
       openInLine() {
@@ -361,6 +368,9 @@
         if (!this.form.patientType) {
           return 'กรุณาเลือกประเภทผู้ป่วย';
         }
+        if (!this.guidanceAccepted) {
+          return 'คุณต้องยอมรับรายละเอียดเงื่อนไขการจองห้องพิเศษก่อนทำรายการ';
+        }
         if (!this.form.patientName.trim()) {
           return 'กรุณาระบุชื่อ-สกุลผู้เข้าพัก';
         }
@@ -373,10 +383,10 @@
         if (!this.form.bookingDate) {
           return 'กรุณาระบุวันที่จองห้อง';
         }
-        if (!this.form.checkinDate) {
-          return 'กรุณาระบุวันที่ต้องการเข้าพัก';
+        if (this.form.patientType === 'ผู้ป่วยจองล่วงหน้า' && !this.form.checkinDate) {
+          return 'กรุณาระบุวันที่ต้องการเข้าพัก (จำเป็นสำหรับการจองล่วงหน้า)';
         }
-        if (this.form.checkinDate < this.form.bookingDate) {
+        if (this.form.checkinDate && this.form.checkinDate < this.form.bookingDate) {
           return 'วันที่ต้องการเข้าพักต้องไม่ก่อนวันที่จองห้อง';
         }
         if (!this.form.rights) {
@@ -385,14 +395,11 @@
         if (!this.form.department) {
           return 'กรุณาเลือกหอผู้ป่วยหรือแผนก';
         }
-        if (!this.form.roomPrices.length) {
-          return 'กรุณาเลือกราคาห้องพิเศษอย่างน้อย 1 รายการ';
+        if (this.form.department === 'อื่นๆ' && !this.form.departmentOther.trim()) {
+          return 'กรุณาระบุแผนกอื่นๆ';
         }
-        if (this.form.roomPrices.includes('1500') && this.form.department !== 'สูติ-นรีเวชกรรม') {
-          return 'ราคาห้อง 1500 บาท ใช้ได้เฉพาะแผนกสูติ-นรีเวชกรรม';
-        }
-        if (!this.form.roomBooked.length) {
-          return 'กรุณาเลือกห้องพิเศษอย่างน้อย 1 ห้อง';
+        if (this.form.roomBooked.length === 0) {
+          return 'กรุณาเลือกห้องพิเศษที่ต้องการ';
         }
         if (this.form.isStaffOrRelative && !this.form.notes.trim()) {
           return 'กรุณาระบุรายละเอียดเจ้าหน้าที่หรือญาติสายตรง';
@@ -406,7 +413,8 @@
           Swal.fire({
             icon: 'warning',
             title: 'ตรวจสอบข้อมูลไม่ครบ',
-            text: validationError
+            text: validationError,
+            confirmButtonText: 'ตกลง'
           });
           return;
         }
@@ -414,7 +422,27 @@
         this.pendingRequestId = buildRequestId();
         this.submitting = true;
 
+        // Show premium loading popup
+        Swal.fire({
+          title: 'กำลังส่งข้อมูลการจอง...',
+          html: 'ระบบกำลังดำเนินการบันทึกข้อมูลและออกใบจอง PDF กรุณารอสักครู่',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Build request payload
+        const finalDept = this.form.department === 'อื่นๆ' ? `อื่นๆ (${this.form.departmentOther.trim()})` : this.form.department;
+
+        // Get room details
+        const selectedRoomName = this.form.roomBooked[0];
+        const roomObj = STATIC_ROOMS.find(r => r.roomName === selectedRoomName);
+        const priceArray = roomObj ? [String(roomObj.price)] : this.form.roomPrices;
+
         const payload = Object.assign({}, this.form, {
+          department: finalDept,
+          roomPrices: priceArray,
           requestId: this.pendingRequestId,
           line: {
             environment: this.lineState.environment,
@@ -445,7 +473,8 @@
           Swal.fire({
             icon: 'error',
             title: 'ยังไม่ได้รับผลการบันทึก',
-            text: 'กรุณาตรวจสอบการเชื่อมต่อระบบ และทดลองส่งข้อมูลอีกครั้ง'
+            text: 'กรุณาตรวจสอบการเชื่อมต่อระบบ และทดลองส่งข้อมูลอีกครั้ง',
+            confirmButtonText: 'ตกลง'
           });
         }, 30000);
       },
@@ -464,6 +493,7 @@
         this.pendingRequestId = '';
 
         if (payload.ok) {
+          this.sendLineFlexMessage(payload.data || {});
           this.showSuccess(payload.data || {});
           this.resetForm();
           return;
@@ -472,17 +502,212 @@
         Swal.fire({
           icon: 'error',
           title: 'บันทึกข้อมูลไม่สำเร็จ',
-          text: payload.error && payload.error.message ? payload.error.message : 'เกิดข้อผิดพลาดระหว่างบันทึกข้อมูล'
+          text: payload.error && payload.error.message ? payload.error.message : 'เกิดข้อผิดพลาดระหว่างบันทึกข้อมูล',
+          confirmButtonText: 'ตกลง'
         });
+      },
+
+      async sendLineFlexMessage(data) {
+        if (!window.liff || !window.liff.isInClient()) {
+          console.log('Not in LINE client environment. Skipping Flex Message.');
+          return;
+        }
+
+        const pdf = data.pdf || {};
+        if (!pdf.url) {
+          console.warn('No PDF URL available. Skipping Flex Message.');
+          return;
+        }
+
+        const patientName = this.form.patientName || '-';
+        const bookingRef = data.bookingReference || '-';
+        const checkinDate = this.form.checkinDate || 'ตามคิวว่าง';
+        const dept = this.form.department === 'อื่นๆ' ? this.form.departmentOther : this.form.department;
+        const roomName = this.form.roomBooked[0] || '-';
+
+        const flexContents = {
+          type: "bubble",
+          header: {
+            type: "box",
+            layout: "vertical",
+            backgroundColor: "#0e3a46",
+            contents: [
+              {
+                type: "text",
+                text: "ใบยืนยันการจองห้องพิเศษ",
+                weight: "bold",
+                color: "#ffffff",
+                size: "lg"
+              },
+              {
+                type: "text",
+                text: "โรงพยาบาลสมเด็จพระยุพราชสว่างแดนดิน",
+                color: "#a9d5df",
+                size: "xs",
+                margin: "xs"
+              }
+            ]
+          },
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "md",
+            contents: [
+              {
+                type: "box",
+                layout: "vertical",
+                contents: [
+                  {
+                    type: "text",
+                    text: "สถานะการจอง: สำเร็จ",
+                    weight: "bold",
+                    size: "md",
+                    color: "#2b8a57"
+                  },
+                  {
+                    type: "text",
+                    text: "เลขอ้างอิง: " + bookingRef,
+                    size: "xs",
+                    color: "#888888",
+                    margin: "xs"
+                  }
+                ]
+              },
+              {
+                type: "separator"
+              },
+              {
+                type: "box",
+                layout: "vertical",
+                spacing: "xs",
+                contents: [
+                  {
+                    type: "box",
+                    layout: "horizontal",
+                    contents: [
+                      {
+                        type: "text",
+                        text: "ชื่อผู้ป่วย",
+                        color: "#aaaaaa",
+                        size: "sm",
+                        flex: 3
+                      },
+                      {
+                        type: "text",
+                        text: patientName,
+                        color: "#333333",
+                        size: "sm",
+                        flex: 7,
+                        weight: "bold"
+                      }
+                    ]
+                  },
+                  {
+                    type: "box",
+                    layout: "horizontal",
+                    contents: [
+                      {
+                        type: "text",
+                        text: "หอผู้ป่วย",
+                        color: "#aaaaaa",
+                        size: "sm",
+                        flex: 3
+                      },
+                      {
+                        type: "text",
+                        text: dept,
+                        color: "#333333",
+                        size: "sm",
+                        flex: 7
+                      }
+                    ]
+                  },
+                  {
+                    type: "box",
+                    layout: "horizontal",
+                    contents: [
+                      {
+                        type: "text",
+                        text: "ห้องจอง",
+                        color: "#aaaaaa",
+                        size: "sm",
+                        flex: 3
+                      },
+                      {
+                        type: "text",
+                        text: roomName,
+                        color: "#333333",
+                        size: "sm",
+                        flex: 7,
+                        wrap: true
+                      }
+                    ]
+                  },
+                  {
+                    type: "box",
+                    layout: "horizontal",
+                    contents: [
+                      {
+                        type: "text",
+                        text: "วันที่เข้าพัก",
+                        color: "#aaaaaa",
+                        size: "sm",
+                        flex: 3
+                      },
+                      {
+                        type: "text",
+                        text: checkinDate,
+                        color: "#333333",
+                        size: "sm",
+                        flex: 7
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            spacing: "sm",
+            contents: [
+              {
+                type: "button",
+                style: "primary",
+                color: "#0e3a46",
+                action: {
+                  type: "uri",
+                  label: "เปิดไฟล์ใบจอง (PDF)",
+                  uri: pdf.url
+                }
+              }
+            ]
+          }
+        };
+
+        try {
+          console.log('Sending LINE Flex Message...');
+          await window.liff.sendMessages([
+            {
+              type: 'flex',
+              altText: 'ใบยืนยันการจองห้องพิเศษ - ' + bookingRef,
+              contents: flexContents
+            }
+          ]);
+          console.log('LINE Flex Message sent successfully.');
+        } catch (err) {
+          console.error('Failed to send LINE Flex Message:', err);
+        }
       },
 
       showSuccess(data) {
         const pdf = data.pdf || {};
         const pdfLinkHtml = pdf.url
-          ? '<div class="mt-3"><a class="btn btn-outline-primary btn-sm" href="' + escapeHtml(pdf.url) + '" target="_blank" rel="noopener noreferrer">เปิดใบจอง PDF</a></div>'
+          ? '<div class="mt-3"><a class="btn btn-primary-action btn-sm w-100" href="' + escapeHtml(pdf.url) + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-pdf"></i> ดาวน์โหลดใบจอง PDF</a></div>'
           : '';
         const pdfWarningHtml = pdf.enabled && pdf.error
-          ? '<div class="alert alert-warning mt-3 mb-0">บันทึกข้อมูลสำเร็จแล้ว แต่สร้าง PDF ไม่สำเร็จ: ' + escapeHtml(pdf.error) + '</div>'
+          ? '<div class="alert alert-warning mt-3 mb-0">บันทึกสำเร็จ แต่สร้าง PDF ไม่สำเร็จ: ' + escapeHtml(pdf.error) + '</div>'
           : '';
         const lineVerifiedHtml = data.line && data.line.verified
           ? '<p class="mb-2"><strong>ผู้ทำรายการผ่าน LINE:</strong> ' + escapeHtml(data.line.displayName || '-') + '</p>'
@@ -492,7 +717,7 @@
           icon: 'success',
           title: 'บันทึกการจองสำเร็จ',
           html:
-            '<div class="text-start">' +
+            '<div class="text-start fs-6">' +
             '<p class="mb-2"><strong>เลขอ้างอิง:</strong> ' + escapeHtml(data.bookingReference || '-') + '</p>' +
             '<p class="mb-2"><strong>เวลาบันทึก:</strong> ' + escapeHtml(data.savedAt || '-') + '</p>' +
             lineVerifiedHtml +
@@ -505,7 +730,8 @@
 
       resetForm() {
         this.form = createEmptyForm();
-        this.vipPriceWarning = false;
+        this.guidanceAccepted = false;
+        this.selectedRightBenefit = null;
         this.bookingGuideTab = 'inpatient';
       },
 
@@ -569,18 +795,7 @@
       lineContactUrl: payload.lineContactUrl || buildLineUrl(payload.lineId || DEFAULT_BOOTSTRAP.lineId),
       submitMode: payload.submitMode || DEFAULT_BOOTSTRAP.submitMode,
       options: payload.options || cloneBootstrap(DEFAULT_BOOTSTRAP).options,
-      roomConfigurations: Array.isArray(payload.roomConfigurations) ? payload.roomConfigurations.map(normalizeRoom) : []
-    };
-  }
-
-  function normalizeRoom(room) {
-    return {
-      id: String(room.id || buildRequestId()),
-      department: String(room.department || '').trim(),
-      price: String(room.price || '').trim(),
-      roomName: String(room.roomName || '').trim(),
-      capacity: String(room.capacity || '').trim(),
-      note: String(room.note || '').trim()
+      roomConfigurations: Array.isArray(payload.roomConfigurations) ? payload.roomConfigurations : []
     };
   }
 
