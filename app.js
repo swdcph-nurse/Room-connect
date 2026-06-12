@@ -61,10 +61,13 @@
     {
       rights: 'สิทธิ์สวัสดิการข้าราชการ (เบิกได้-จ่ายตรง)',
       shortLabel: 'สิทธิ์สวัสดิการข้าราชการ (เบิกได้-จ่ายตรง)',
-      detail: 'ส่วนลดค่าห้องพิเศษจากราคาเต็ม 1,000 บาท / คืน',
+      detail: 'ส่วนลดค่าห้องพิเศษ 1,000 บาท/คืน + ส่วนลดเพิ่ม 50% ของส่วนต่างที่เหลือ',
       calculate(price) {
-        const discount = Math.min(1000, price);
-        return { discount, payable: Math.max(price - discount, 0) };
+        const baseDiscount = Math.min(1000, price);
+        const remaining = price - baseDiscount;
+        const extraDiscount = Math.round(remaining * 0.5);
+        const totalDiscount = baseDiscount + extraDiscount;
+        return { discount: totalDiscount, payable: price - totalDiscount };
       }
     },
     {
@@ -244,14 +247,22 @@
         this.lineState.liffId = envConfig.liffId;
         this.lineState.liffUrl = envConfig.liffUrl;
 
+        const isLineBrowser = /Line/i.test(navigator.userAgent);
+
         if (!envConfig.liffId) {
           this.lineState.statusMessage = 'ยังไม่ได้กำหนด LIFF ID';
+          if (isLineBrowser) {
+            this.lineState.inClient = true;
+          }
           return;
         }
 
         if (!window.liff) {
           this.lineState.error = 'ไม่พบ LIFF SDK';
           this.lineState.statusMessage = 'ไม่สามารถเชื่อมต่อ LINE Mini App ได้';
+          if (isLineBrowser) {
+            this.lineState.inClient = true;
+          }
           return;
         }
 
@@ -263,6 +274,12 @@
           this.lineState.inClient = window.liff.isInClient();
           this.lineState.loggedIn = window.liff.isLoggedIn();
           this.lineState.idToken = window.liff.getIDToken() || '';
+
+          // Auto-login if inside LINE environment and not logged in
+          if (!this.lineState.loggedIn && (this.lineState.inClient || isLineBrowser)) {
+            window.liff.login();
+            return;
+          }
 
           if (typeof window.liff.getProfile === 'function' && this.lineState.loggedIn) {
             const profile = await window.liff.getProfile();
@@ -278,6 +295,9 @@
         } catch (error) {
           this.lineState.error = getErrorMessage(error);
           this.lineState.statusMessage = 'เชื่อมต่อ LINE Mini App ไม่สำเร็จ';
+          if (isLineBrowser) {
+            this.lineState.inClient = true;
+          }
         } finally {
           this.lineState.loading = false;
         }
@@ -362,8 +382,11 @@
         if (!this.config.apiUrl) {
           return 'ยังไม่ได้ตั้งค่า GAS Web App URL';
         }
+        const isLineEnv = this.lineState.inClient || /Line/i.test(navigator.userAgent);
         if (this.requiresLineLogin && !this.lineState.idToken) {
-          return 'กรุณาเปิดแบบฟอร์มผ่าน LINE Mini App เพื่อยืนยันตัวตนก่อนทำรายการ';
+          if (!isLineEnv) {
+            return 'กรุณาเปิดแบบฟอร์มผ่าน LINE Mini App เพื่อยืนยันตัวตนก่อนทำรายการ';
+          }
         }
         if (!this.form.patientType) {
           return 'กรุณาเลือกประเภทผู้ป่วย';
