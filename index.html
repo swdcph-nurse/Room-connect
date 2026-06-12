@@ -68,8 +68,11 @@
           <div class="user-panel" style="background: var(--brand-light); border-color: rgba(14, 58, 70, 0.2);" x-show="!lineState.displayName" x-cloak>
             <div class="user-info w-100">
               <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <span class="user-name"><i class="fab fa-line text-success me-2"></i>เข้าใช้งานผ่าน LINE Mini App เพื่อยืนยันตัวตน</span>
-                <button type="button" class="btn-primary-action py-1 px-3" style="font-size: 0.85rem;" @click="openInLine">เปิดผ่าน LINE</button>
+                <span class="user-name"><i class="fab fa-line text-success me-2"></i>เข้าใช้งานผ่าน LINE หรือเข้าสู่ระบบเพื่อยืนยันตัวตน</span>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn-primary-action py-1 px-3" style="font-size: 0.85rem; background: #06c755; border-color: #06c755;" @click="loginLine">เข้าสู่ระบบ LINE</button>
+                  <button type="button" class="btn btn-secondary-action py-1 px-3" style="font-size: 0.85rem;" @click="openInLine">เปิดผ่าน LINE</button>
+                </div>
               </div>
             </div>
           </div>
