@@ -6,19 +6,19 @@ window.BOOKING_CONFIG = {
     requireLogin: true,
     environments: {
       developing: {
-        channelId: '2010054954',
-        liffId: '2010054954-37JuM83q',
-        liffUrl: 'https://miniapp.line.me/2010054954-37JuM83q'
+        channelId: '2010383828', // เปลี่ยน Channel ID ใหม่
+        liffId: '2010383828-DhYoaw2H', // เปลี่ยน LIFF ID ใหม่
+        liffUrl: 'https://liff.line.me/2010383828-DhYoaw2H' // เปลี่ยน LIFF URL ใหม่
       },
       review: {
-        channelId: '2010054955',
-        liffId: '2010054955-qYnDrmpP',
-        liffUrl: 'https://miniapp.line.me/2010054955-qYnDrmpP'
+        channelId: '2010383828', // เปลี่ยน Channel ID ใหม่
+        liffId: '2010383828-DhYoaw2H', // เปลี่ยน LIFF ID ใหม่
+        liffUrl: 'https://liff.line.me/2010383828-DhYoaw2H' // เปลี่ยน LIFF URL ใหม่
       },
       published: {
-        channelId: '2010054956',
-        liffId: '2010054956-1yXGQe9P',
-        liffUrl: 'https://miniapp.line.me/2010054956-1yXGQe9P'
+        channelId: '2010383828', // เปลี่ยน Channel ID ใหม่
+        liffId: '2010383828-DhYoaw2H', // เปลี่ยน LIFF ID ใหม่
+        liffUrl: 'https://liff.line.me/2010383828-DhYoaw2H' // เปลี่ยน LIFF URL ใหม่
       }
     }
   }
