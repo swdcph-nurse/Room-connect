@@ -42,9 +42,9 @@
       }
     },
     {
-      rights: 'ประกันสังคม',
+      rights: 'ประกันสังคม *เจ็บป่วยทั่วไป*',
       shortLabel: 'ประกันสังคม',
-      detail: 'ส่วนลดค่าห้องพิเศษจากราคาเต็ม 400 บาท / คืน',
+      detail: 'ส่วนลดค่าห้องพิเศษจากราคาเต็ม 520 บาท / คืน',
       calculate(price) {
         const discount = Math.min(400, price);
         return { discount, payable: Math.max(price - discount, 0) };
